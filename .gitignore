@@ -38,6 +38,7 @@
 !/docs/retention.md
 !/docs/audio-batch.md
 !/docs/audio-replay.md
+!/docs/overnight-results-2026-10-27.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env
