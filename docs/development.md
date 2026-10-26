@@ -33,3 +33,5 @@
 这些检查都不启动训练、GPU、云资源、UE、游戏输入或模型下载。实验输出留在忽略目录 output/，不得把旧工程的绝对路径当本机事实。
 
 本地蒙德城区素材接入与独立 UE 副本见 [场景接入说明](local-scenes.md)。
+
+`audio_replay_train/audit/eval/compare/retention` 提供独立[额外RGB目标对照](audio-replay.md)：同一已审计父状态只复制24个参数，fresh optimizer与新种子，音频项系数/曝光相同、RGB标签与计算额外计费；实际4+4对8跨缺失边界恢复。冻结前逐项审计父复制、原始输入/CE及导出，不修改前次实验的冻结来源。

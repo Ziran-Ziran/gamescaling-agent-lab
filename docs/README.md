@@ -10,6 +10,7 @@ GameScaling Agent Lab 只承担GameScaling 模型训练、多模态输入与低�
 - [一步奖励学习](feedback-learning.md)：首键 SFT 与真实环境奖励学习的输入、预算及评测合同。
 - [音频派生视觉输入](audio-vision.md)：因果 WAV、双图模型适配、缺失与交换消融，明确虚拟传感器边界。
 - [原解码器平衡音频训练](audio-batch.md)：两组各200次实际 LoRA 更新、完整恢复/导出审计与预先冻结的质量和 RGB 保留对照。
+- [RGB 重放对照](audio-replay.md)：相同音频父状态/目标，追加RGB目标的实际64步训练与完整模态、保留对照。
 - [冻结视觉读出](vision-readout.md)：独立任务头、训练来源/恢复与实际动作对照，不替代原模型解码器。
 - [频谱特征缓存](spectral-cache.md)：固定头的交替离线/实际延迟对照，包含真实 P95 退化与缓存因果审计。
 - [RGB 策略保留](retention.md)：五个固定策略的真实回报、原成功回合退化及无信息分母处理。
