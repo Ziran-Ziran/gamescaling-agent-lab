@@ -1,0 +1,9 @@
+# Optional Linux/WSL training environment, separate from controller CI.
+# Existing torch CUDA 12.8 wheels were reused read-only in the first local run.
+torch==2.10.0
+torchvision==0.25.0
+transformers==5.14.1
+peft==0.21.2
+accelerate==1.15.0
+Pillow==13.0.0
+numpy==2.2.6
