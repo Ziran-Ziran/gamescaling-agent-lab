@@ -23,6 +23,8 @@ def main():
     parser.add_argument('--lr', type=float, default=1e-4)
     parser.add_argument('--seed', type=int, default=20261026)
     parser.add_argument('--history-len', type=int, choices=range(0, 33), default=0)
+    parser.add_argument('--deterministic', action=argparse.BooleanOptionalAction, default=True,
+                        help='Require deterministic GPU algorithms; legacy runs need --no-deterministic')
     args = parser.parse_args()
     if not 0 < args.lr <= .01:
         parser.error('lr must be finite and in (0,.01]')
@@ -31,7 +33,8 @@ def main():
         parser.error('requested history exceeds audited history')
     args.output.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
-    backend = RGBBackend(args.model, rank=args.rank, learning_seed=args.seed)
+    backend = RGBBackend(args.model, rank=args.rank, learning_seed=args.seed,
+                         deterministic=args.deterministic)
     torch = backend.torch
     parameters = [p for p in backend.model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(parameters, lr=args.lr, weight_decay=.01)
@@ -42,10 +45,13 @@ def main():
                 'weight_decay': .01, 'history_len': args.history_len,
                 'dtype': 'bfloat16', 'batch_size': 1, 'optimizer': 'AdamW',
                 'packages': environment()['packages']}
+    if args.deterministic:
+        identity['determinism'] = backend.determinism
     step = restore_checkpoint(args.resume, backend.model, optimizer, identity=identity) if args.resume else 0
     if step >= args.steps:
         parser.error('restored step must be below requested total steps')
     config = {'schema_version': 1, 'identity': identity, 'model': backend.identity,
+              'determinism': backend.determinism,
               'environment': environment(), 'started_utc': datetime.now(timezone.utc).isoformat(),
               'start_step': step, 'total_steps': args.steps,
               'trainable_parameters': sum(p.numel() for p in parameters),

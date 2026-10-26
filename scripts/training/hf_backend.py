@@ -24,6 +24,18 @@ def require_guard():
     require(metadata.get('token') == token, 'heavy-task lock owner mismatch')
 
 
+def configure_determinism(enabled):
+    """Configure only this process, before model CUDA handles are created."""
+    if enabled:
+        os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+    import torch
+    torch.use_deterministic_algorithms(enabled)
+    torch.backends.cudnn.deterministic = enabled
+    torch.backends.cudnn.benchmark = False
+    return {'algorithms': enabled, 'cudnn_deterministic': enabled, 'cudnn_benchmark': False,
+            'cublas_workspace_config': os.environ.get('CUBLAS_WORKSPACE_CONFIG')}
+
+
 def load_dataset(directory):
     """Reaudit original episodes and compare every normalized row, not just file hashes."""
     directory = Path(directory)
@@ -87,7 +99,8 @@ def adapter_identity(path):
 
 class RGBBackend:
     def __init__(self, model_path, *, device='cuda', adapter=None, rank=None,
-                 learning_seed=20261026):
+                 learning_seed=20261026, deterministic=False):
+        self.determinism = configure_determinism(deterministic)
         import random
         import torch
         from transformers import AutoModelForImageTextToText, AutoProcessor
