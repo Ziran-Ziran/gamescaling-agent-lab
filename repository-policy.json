@@ -21,6 +21,7 @@
     "docs/data-contract.md",
     "docs/research-plan.md",
     "docs/training.md",
+    "docs/latency.md",
     ".github/CODEOWNERS",
     "docs/local-scenes.md"
   ],

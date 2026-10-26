@@ -58,3 +58,4 @@ jobs:
       - run: python -m unittest discover -s tests -p "test_training*.py" -v
       - run: python -m unittest discover -s tests -p test_resource_guard.py -v
       - run: python -m unittest discover -s tests -p test_audio_contract.py -v
+      - run: python -m unittest discover -s tests -p test_latency_benchmark.py -v
