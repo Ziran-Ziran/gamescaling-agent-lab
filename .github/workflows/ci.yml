@@ -69,3 +69,4 @@ jobs:
       - run: python -m unittest discover -s tests -p test_rollout_compare.py -v
       - run: python -m unittest discover -s tests -p test_retention_compare.py -v
       - run: python -m unittest discover -s tests -p 'test_audio_batch*.py' -v
+      - run: python -m unittest discover -s tests -p 'test_audio_replay*.py' -v

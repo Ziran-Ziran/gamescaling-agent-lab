@@ -37,6 +37,7 @@
 !/docs/spectral-cache.md
 !/docs/retention.md
 !/docs/audio-batch.md
+!/docs/audio-replay.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env
