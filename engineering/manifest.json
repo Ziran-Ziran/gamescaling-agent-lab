@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "canonical_repository": "https://github.com/Ziran-Ziran/gamescaling-agent-lab",
   "files": {
     ".editorconfig": "c5fb749272d8733f90f2357b4c50cc1edb12558bfc7d1c705d9b7553da6bca82",
@@ -9,10 +9,13 @@
     ".github/ISSUE_TEMPLATE/bug_report.md": "3fca65cc7130a890df413b199642161e22fa68d796e3c32661af62b083e395f3",
     ".github/ISSUE_TEMPLATE/feature_request.md": "5a7519274d26f9d1d62ec31289c0341043f0db2435231da3c0049d7aa37f68c9",
     ".github/pull_request_template.md": "a165dc40c801fddf17c7d1af508d8464b2f71e4793b402b425a0a9169ab328d0",
-    "scripts/check_repository.py": "6c31981fe98541c69ea2006d3885041235b2683e11411aceff7233477e1f1dd8",
-    "scripts/sync_engineering.py": "18830c639c996783ad534a2db223a3a90e33e5c342536c21fdaaa64686067d9d",
+    "scripts/check_repository.py": "49c4298526831e942163a6a5648ec7f6213c4849ee18b1123c5878f61ad5e296",
+    "scripts/sync_engineering.py": "ebe2bae2fe908ba24572203d9e622950b0a431bf215089bd207ffbfa9b189ed7",
     "scripts/validate_project.py": "de03508f5ff0190e578f2bf78be974d4f46a33bfef3ad0b3eaa843d52dba11bd",
-    "tests/test_repository_policy.py": "8430cbf107d6ed4ea28346bc149ef6486929710a48092d63cbfc9d0b3873246a",
-    "tests/test_engineering.py": "e44649298846976047de8a9c7b66659e36d1b58442266f66a71b7e0a4794070c"
+    "tests/test_repository_policy.py": "b0bb2cbde81a66b284c31274d07f112ef87115df5915380852347e8bcbeadc53",
+    "tests/test_engineering.py": "d27e52935ae1067eb9c26dbd969fef9659bad827ea0f9ef26636130aa2130e6f",
+    "scripts/local_scene.py": "98cb1c903092f0abfdcc97b02a6ccf8e7f9bd7cf11d874bf9600359acc17a302",
+    "tests/test_local_scene.py": "af9bd8b067b9086969f46332a14fc14518b960d14243e826a7e0ef1ac7aacc15",
+    "docs/local-scenes.md": "b7f299df93bd117a1014e1aa1f8962efc7479342c3d47ecf508813daebcbee0c"
   }
 }

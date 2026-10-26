@@ -27,11 +27,11 @@ class BundleTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
-    def fixture(self, folder, version='1.0.0', suffix=b''):
+    def fixture(self, folder, version='1.0.0', suffix=b'', members=None):
         target = self.root / folder
         manifest = {'schema_version': 1, 'version': version,
                     'canonical_repository': self.sync.CANONICAL_REPOSITORY, 'files': {}}
-        for name in self.sync.BUNDLE_FILES:
+        for name in members or self.sync.BUNDLE_FILES:
             file = target / name
             file.parent.mkdir(parents=True, exist_ok=True)
             data = b'# fixture\n' + suffix
@@ -73,6 +73,21 @@ class BundleTests(unittest.TestCase):
         before = {p: (target / p).read_bytes() for p in self.sync.BUNDLE_FILES}
         self.assertNotEqual(self.run_sync(target, source, apply=True).returncode, 0)
         self.assertEqual(before, {p: (target / p).read_bytes() for p in before})
+
+    def test_legacy_bundle_can_add_only_the_fixed_new_files(self):
+        target = self.fixture('target', members=self.sync.BUNDLE_FILES[:11])
+        source = self.fixture('source', '1.1.0', b'# new\n')
+        result = self.run_sync(target, source, apply=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.run_sync(target).returncode, 0)
+
+    def test_legacy_upgrade_preserves_preexisting_untracked_new_file(self):
+        target = self.fixture('target', members=self.sync.BUNDLE_FILES[:11])
+        source = self.fixture('source', '1.1.0', b'# new\n')
+        existing = target / 'scripts/local_scene.py'
+        existing.write_bytes(b'local untracked code')
+        self.assertNotEqual(self.run_sync(target, source, apply=True).returncode, 0)
+        self.assertEqual(existing.read_bytes(), b'local untracked code')
 
     def test_local_edits_are_not_overwritten(self):
         target = self.fixture('target')

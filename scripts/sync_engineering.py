@@ -16,18 +16,20 @@ BUNDLE_FILES = (
     '.github/pull_request_template.md', 'scripts/check_repository.py',
     'scripts/sync_engineering.py', 'scripts/validate_project.py',
     'tests/test_repository_policy.py', 'tests/test_engineering.py',
+    'scripts/local_scene.py', 'tests/test_local_scene.py', 'docs/local-scenes.md',
 )
 MANIFEST = 'engineering/manifest.json'
+LEGACY_BUNDLE_FILES = BUNDLE_FILES[:11]
 
 
-def regular(root, name):
+def regular(root, name, missing_ok=False):
     path = root / name
     for part in (path, *path.parents):
         if part.is_symlink() or (hasattr(os.path, 'isjunction') and os.path.isjunction(part)):
             raise ValueError('linked path is not allowed: ' + name)
         if part == root:
             break
-    if not path.is_file():
+    if not path.is_file() and not (missing_ok and not path.exists()):
         raise ValueError('missing regular file: ' + name)
     return path
 
@@ -44,10 +46,11 @@ def load_bundle(root):
     if not isinstance(manifest.get('version'), str) or not re.fullmatch(r'\d+\.\d+\.\d+', manifest['version']):
         raise ValueError('invalid bundle version')
     hashes = manifest.get('files')
-    if not isinstance(hashes, dict) or set(hashes) != set(BUNDLE_FILES):
-        raise ValueError('manifest does not match the fixed bundle file list')
+    supported_sets = (set(BUNDLE_FILES), set(LEGACY_BUNDLE_FILES))
+    if not isinstance(hashes, dict) or set(hashes) not in supported_sets:
+        raise ValueError('manifest does not match a supported fixed bundle file list')
     data = {}
-    for name in BUNDLE_FILES:
+    for name in hashes:
         content = regular(root, name).read_bytes()
         expected = hashes[name]
         if not isinstance(expected, str) or not re.fullmatch(r'[0-9a-f]{64}', expected):
@@ -61,6 +64,7 @@ def load_bundle(root):
 
 def atomic_write(path, content):
     # Existing files and parents were checked before any mutation.
+    path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.engineering-', delete=False) as stream:
         pending = Path(stream.name)
         stream.write(content)
@@ -72,7 +76,8 @@ def atomic_write(path, content):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1], help=argparse.SUPPRESS)
+    parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1],
+                        help='explicit target repository, including supported older bundles')
     parser.add_argument('--source-root', type=Path)
     parser.add_argument('--apply', action='store_true')
     args = parser.parse_args()
@@ -81,21 +86,30 @@ def main():
         if args.apply and args.source_root is None:
             raise ValueError('--apply requires an explicit reviewed --source-root')
         if args.source_root is None:
-            print(f'Engineering bundle {local["version"]}: {len(BUNDLE_FILES)} files verified.')
+            print(f'Engineering bundle {local["version"]}: {len(local["files"])} files verified.')
             return 0
         source, after = load_bundle(args.source_root)
-        changed = [name for name in before if before[name] != after[name]]
+        if not set(before) <= set(after):
+            raise ValueError('source bundle cannot remove existing fixed bundle files')
+        changed = [name for name in after if before.get(name) != after[name]]
+        for name in changed:
+            target = regular(args.root, name, missing_ok=True)
+            if name not in before and target.exists():
+                raise ValueError('new bundle file would overwrite an untracked local file: ' + name)
         if changed and not args.apply:
             print(f'Bundle differences: {len(changed)} file(s); no files changed.', file=sys.stderr)
             return 1
         written = []
         try:
             for name in changed:
-                atomic_write(regular(args.root, name), after[name])
+                atomic_write(regular(args.root, name, missing_ok=True), after[name])
                 written.append(name)
         except OSError:
             for name in reversed(written):
-                atomic_write(regular(args.root, name), before[name])
+                if name in before:
+                    atomic_write(regular(args.root, name), before[name])
+                else:
+                    regular(args.root, name).unlink()
             raise
         print(f'Engineering bundle {source["version"]}: {len(changed)} file(s) synchronized.')
         return 0
