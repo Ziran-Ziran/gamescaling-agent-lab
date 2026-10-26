@@ -30,4 +30,14 @@ controller 的运行协议仍以现有源码为准。RGB 轨迹审计/转换及�
 
 每帧必须显式填写 `terminated`、`truncated` 布尔值，两者不能同时为真。仅最后一帧必须有一个终止标记和非空 `terminal_reason`，其他帧 reason 为 null。未完成执行会被排除并清空连续历史；原始文件保留以审计失败/部分动作，转换清单记录排除帧及每个 episode 的最终结果，包括最后一帧未完成的情况。源轨迹与转换行逐行复核，训练前再次校验。
 
-划分文件是具有 `train`、`validation`、`test` 三个非空 game_id 列表的 JSON。各游戏只属一组，episode_id 全局唯一，RGB 字节哈希不得跨组；同一游戏中的相邻帧始终同组。默认保留最多五个因果历史，首次 RGB 冒烟使用零历史。合成来源的时钟、动作、终止与游戏 ID 必须明确标为合成，不作为环境任务反馈或跨游戏能力证据。
+划分文件是具有 `train`、`validation`、`test` 三个非空 game_id 列表的 JSON。各游戏只属一组，episode_id 全局唯一，解码 RGB 像素哈希不得跨组；同一游戏中的相邻帧始终同组。默认保留最多五个因果历史，首次 RGB 冒烟使用零历史。合成来源的时钟、动作、终止与游戏 ID 必须明确标为合成，不作为环境任务反馈或跨游戏能力证据。
+
+## 可选音频窗口 v1
+
+独立的 `scripts.training.audio.read_audio` 校验玩家可观察的音频，不向现有 RGB GameScaling API 静默增加字段。它尚未集成进 RGB 轨迹转换器或官方模型；实际融合验收范围见 [训练说明](training.md)。
+
+有效通道声明 `present: true`、相对 `path`、文件 `sha256`、`sample_rate`（8,000–48,000Hz）、`channels: 1`、`encoding: pcm_s16le`、`clock_id`、`window_start_ns`、`window_end_ns`、`available_ns`。当前只接受单声道 PCM16 WAV，样本数与窗口时长相符、最长一秒；记录中的采样率/通道/位宽必须与 WAV 头一致。
+
+通道和 RGB 采样必须用同一 episode 单调时钟：`start < end <= available <= captured_ns`，默认窗口结束距 RGB 不超过 50ms。未来窗口、尚未可用、过期或时钟不一致返回 `present: false`、`missing_reason` 和空 waveform，不读取对应音频；格式、哈希、时长或路径损坏会报错。显式缺失通道为 `present: false` 加非空 `missing_reason`。
+
+有效静音保留 `present: true`，不能与缺失混同。固定特征为八个归一化频带能量、RMS 与过零率，缺失通道和静音都可产生零特征，但布尔掩码不同。单样本窗口过零率定义为 0，禁止产生 NaN。训练和推理必须同时携带掩码；未来片段不会补作历史上下文。
