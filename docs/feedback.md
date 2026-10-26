@@ -67,6 +67,8 @@ $PY scripts/resource_guard.py --lock "$GPU_LOCK" --seconds 600 -- \
 
 完整运行的 `summary.json` 按规则分别给出成功率、回报、步数、格式/fallback/过滤比例与时延，重复审计完整反馈。时延分项包含渲染、PNG 编码/写入/哈希、解码、处理器编码、设备传输、推理、过滤、实际执行。`policy_call` 包含处理与推理，不能与其子项重复相加；采样到执行结束不含采样前渲染，整圈时间还包含反馈检查。没有网络传输和排队的阶段填 null。首请求冷启动未剔除，P95 使用最近秩；小样本与暂停式环境不能推出在线尾延迟或过期率。
 
+默认 `--decoder full` 保留完整模型生成；显式 `--decoder first-key` 启用五类整块动作预测并由模板生成文本。后者逐帧保存原 logits、选类和 `text_source`，格式合法是序列化保证，不能作为模型格式学习结果。动作空间和固定权重时延/任务对照见[解码实验](latency.md)。
+
 ## 首轮固定预算结果与失败
 
 2026-10-27，官方 `THUSI-Lab/GameScaling-0.8B-S3` 快照 `1b89640dcf2ef51fb53ad9338a0725e9622dd200`，单张 RTX 5070 Ti Laptop GPU，bf16、Transformers 5.14.1、PyTorch 2.10.0/cu128、PEFT 0.21.2。模型权重 SHA256 为 `d553c0796833691e32277a937db649eaac39bae9a0028a63c964c12a261c2dfa`。数据源 SHA256 为 `820b451a4512ab293ec6828ac5a693dd527a53da1867ea67d6de3e3ebf03ce7f`；源含训练 64、验证 8、测试 24 个实际完成的动作窗口。只有训练 reach 数据进入梯度更新。

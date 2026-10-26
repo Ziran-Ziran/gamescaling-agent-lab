@@ -106,6 +106,8 @@ def _run_steps(policy, root, game, episode, history_len):
                  'filtered_action': to_action_text(action), **result,
                  'policy': {**decision_info, 'generated_tokens': decision['generated_tokens']},
                  'timing_ms': timing}
+        if decision.get('decoder_record') is not None:
+            frame['policy']['decoder_record'] = decision['decoder_record']
         episode['frames'].append(frame)
         _append_json(root / 'transitions.jsonl', {'episode_id': game.episode_id, 'frame': frame})
         # game.step has already validated completed action physics and timing.
@@ -147,6 +149,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--adapter', type=Path)
+    parser.add_argument('--decoder', choices=('full', 'first-key'), default='full')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--episodes-per-game', type=int, choices=range(1, 17), default=4)
     parser.add_argument('--seed-start', type=int, default=3000)
@@ -181,11 +184,19 @@ def _write_status(output, status):
 def _execute(args, status):
     from scripts.training.hf_backend import RGBBackend, environment
     started_utc = datetime.now(timezone.utc).isoformat()
-    backend = RGBBackend(args.model, adapter=args.adapter)
+    if args.decoder == 'first-key':
+        from scripts.training.action_head import FirstKeyBackend
+        backend = FirstKeyBackend(args.model, adapter=args.adapter)
+    else:
+        backend = RGBBackend(args.model, adapter=args.adapter)
     config = {'schema_version': 1, 'started_utc': started_utc, 'model': backend.identity,
               'adapter': backend.adapter_identity, 'environment': environment(),
               'arguments': {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()},
-              'generation': {'do_sample': False, 'stop': '<|action_end|>', 'reasoning': False},
+              'generation': {'do_sample': False, 'stop': '<|action_end|>', 'reasoning': False,
+                             'decoder': args.decoder,
+                             'action_space': 'full official proposal then WASD filter' if args.decoder == 'full'
+                                             else '5way whole-window W/A/S/D/noop; safe text template',
+                             'effective_predicted_tokens': 1 if args.decoder == 'first-key' else None},
               'cache': 'no warmup excluded; first request cold, sequential warm weights; no shared KV cache',
               'task_boundary': 'own headless rule variants; world paused during inference; not real-time commercial gameplay',
               'actor_inputs': 'RGB + fixed visible rules + completed action history only',
@@ -195,6 +206,7 @@ def _execute(args, status):
                   Path(__file__), Path(__file__).with_name('headless.py'),
                   Path(__file__).with_name('feedback.py'), Path(__file__).with_name('hf_backend.py'),
                   Path(__file__).with_name('formatting.py'), Path(__file__).with_name('metrics.py'),
+                  Path(__file__).with_name('action_head.py'),
                   Path('controller/control_core.py'))}}
     (args.output / 'config.json').write_text(json.dumps(config, indent=2), encoding='utf-8')
 
@@ -202,7 +214,8 @@ def _execute(args, status):
         batch, _, timing = backend.prepare(row, args.output, history_len=args.history_len)
         completion, tokens, inference_ms = backend.generate(batch, max_new_tokens=args.max_new_tokens)
         return {'completion': completion, 'generated_tokens': tokens,
-                'timing_ms': {**timing, 'inference': inference_ms}}
+                'timing_ms': {**timing, 'inference': inference_ms},
+                'decoder_record': getattr(backend, 'last_head_record', None)}
 
     episodes = []
     status['state'] = 'running'
