@@ -30,6 +30,7 @@
 !/docs/research-plan.md
 !/docs/training.md
 !/docs/latency.md
+!/docs/feedback.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env
