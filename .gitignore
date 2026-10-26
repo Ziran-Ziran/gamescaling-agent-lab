@@ -35,6 +35,7 @@
 !/docs/audio-vision.md
 !/docs/vision-readout.md
 !/docs/spectral-cache.md
+!/docs/retention.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env

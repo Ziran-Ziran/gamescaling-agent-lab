@@ -11,6 +11,7 @@ GameScaling Agent Lab 只承担GameScaling 模型训练、多模态输入与低�
 - [音频派生视觉输入](audio-vision.md)：因果 WAV、双图模型适配、缺失与交换消融，明确虚拟传感器边界。
 - [冻结视觉读出](vision-readout.md)：独立任务头、训练来源/恢复与实际动作对照，不替代原模型解码器。
 - [频谱特征缓存](spectral-cache.md)：固定头的交替离线/实际延迟对照，包含真实 P95 退化与缓存因果审计。
+- [RGB 策略保留](retention.md)：五个固定策略的真实回报、原成功回合退化及无信息分母处理。
 - [迁移](migration.md)：固定来源与旧工程的连续性。
 - [共享维护](shared-engineering.md)：可独立克隆的版本化工程副本。
 - [发布规则](repository-policy.md)：源码白名单与 GitHub 约定。
