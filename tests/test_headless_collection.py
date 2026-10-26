@@ -21,6 +21,19 @@ class Clock:
 
 
 class HeadlessCollectionTests(unittest.TestCase):
+    def test_one_step_corpus_keeps_impossible_keydoor_outcome_honest(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / 'one-step'
+            report = collect(root, counts={'train': 1, 'validation': 1, 'test': 1},
+                             clock_factory=Clock, max_steps=1)
+            self.assertEqual(report['frames'], 3)
+            self.assertEqual(report['observed_successes'], 2)
+            dataset, _, _ = load_dataset(root / 'converted')
+            self.assertEqual(len(dataset['test']), 1)
+            episodes = [json.loads(line) for line in (root / 'episodes.jsonl').read_text().splitlines()]
+            self.assertEqual(episodes[-1]['frames'][-1]['terminal_reason'], 'horizon')
+            self.assertTrue(episodes[-1]['frames'][-1]['truncated'])
+
     def test_expert_collection_passes_both_feedback_and_training_audits(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder) / 'run'

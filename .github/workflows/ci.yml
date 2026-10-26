@@ -62,3 +62,4 @@ jobs:
       - run: python -m unittest discover -s tests -p 'test_headless*.py' -v
       - run: python -m unittest discover -s tests -p test_action_head.py -v
       - run: python -m unittest discover -s tests -p test_decoding_benchmark.py -v
+      - run: python -m unittest discover -s tests -p test_feedback_learning.py -v

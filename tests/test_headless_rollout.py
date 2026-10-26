@@ -6,7 +6,7 @@ import unittest
 
 from controller.control_core import SafeAction, to_action_text
 from scripts.training.feedback import audit_feedback_episodes
-from scripts.training.rollout import filter_completion, run_episode, summarize_episodes
+from scripts.training.rollout import filter_completion, make_schedule, run_episode, summarize_episodes
 
 
 class Clock:
@@ -25,6 +25,25 @@ def text(key=None):
 
 
 class RolloutTests(unittest.TestCase):
+    def test_selected_games_keep_global_seed_offsets_and_no_duplicate_tasks(self):
+        self.assertEqual(make_schedule(['hazard'], 12000, 2), [('hazard', 13000), ('hazard', 13001)])
+        self.assertEqual(make_schedule(['reach', 'keydoor'], 12000, 1), [('reach', 12000), ('keydoor', 14000)])
+        for games in ([], ['reach', 'reach'], ['unknown']):
+            with self.subTest(games=games), self.assertRaises(ValueError):
+                make_schedule(games, 0, 1)
+
+    def test_tagged_training_resets_have_unique_episode_ids_without_changed_rgb(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            episodes = [run_episode(lambda row: {'completion': text('W'), 'generated_tokens': 0, 'timing_ms': {}},
+                                    root, variant='reach', seed=0, max_steps=1, clock=Clock(),
+                                    episode_tag=f'update-{index}') for index in range(2)]
+            self.assertNotEqual(episodes[0]['episode_id'], episodes[1]['episode_id'])
+            self.assertEqual(episodes[0]['frames'][0]['rgb']['sha256'], episodes[1]['frames'][0]['rgb']['sha256'])
+            audit_feedback_episodes(episodes, root)
+            with self.assertRaises(ValueError):
+                run_episode(None, root, variant='reach', seed=0, episode_tag='../escape')
+
     def test_strict_parse_filter_and_failure_are_separate(self):
         action, info = filter_completion(text('W'))
         self.assertTrue(info['strict_valid'])

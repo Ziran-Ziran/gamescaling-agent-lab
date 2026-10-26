@@ -31,6 +31,7 @@
 !/docs/training.md
 !/docs/latency.md
 !/docs/feedback.md
+!/docs/feedback-learning.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env
