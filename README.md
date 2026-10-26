@@ -44,6 +44,7 @@ Linux/macOS 将解释器路径换成 `.venv/bin/python`。完整控制器测试�
 - [架构与模块边界](docs/architecture.md)、[开发与平台限制](docs/development.md)
 - [研究问题与实验设计](docs/research-plan.md)、[阶段路线图](docs/roadmap.md)
 - [输入、时间、模态和评测协议](docs/data-contract.md)
+- [固定策略推理执行与延迟对照](docs/latency.md)
 - [分拆来源与本地数据处理](docs/migration.md)、[共享工程工具维护](docs/shared-engineering.md)
 - [贡献指南](CONTRIBUTING.md)、[发布范围](docs/repository-policy.md)、[授权说明](NOTICE.md)
 
