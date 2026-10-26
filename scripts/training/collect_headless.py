@@ -15,10 +15,11 @@ from scripts.training.feedback import audit_feedback_episodes
 from scripts.training.headless import GAME_IDS, HeadlessGame
 
 
-def collect(output, *, counts=None, clock_factory=None):
+def collect(output, *, counts=None, clock_factory=None, max_steps=8):
     counts = counts or {'train': 64, 'validation': 8, 'test': 8}
     require(set(counts) == {'train', 'validation', 'test'}
             and all(type(n) is int and 1 <= n <= 128 for n in counts.values()), 'invalid collection counts')
+    require(type(max_steps) is int and 1 <= max_steps <= 32, 'invalid collection horizon')
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     source = output / 'episodes.jsonl'
@@ -30,7 +31,7 @@ def collect(output, *, counts=None, clock_factory=None):
         splits[split] = [GAME_IDS[variant]]
         for seed in range(first_seed, first_seed + counts[split]):
             clock = clock_factory() if clock_factory else None
-            game = HeadlessGame(variant=variant, seed=seed,
+            game = HeadlessGame(variant=variant, seed=seed, max_steps=max_steps,
                                 **({'clock_ns': clock.ns, 'sleep': clock.sleep} if clock else {}))
             episode = {'schema_version': 1, 'episode_id': game.episode_id,
                        'game_id': GAME_IDS[variant], 'game_build': 'procedural-point-grid-v1',
@@ -75,7 +76,8 @@ def collect(output, *, counts=None, clock_factory=None):
     (output / 'feedback-audit.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
     manifest = convert(source, split_path, output, output / 'converted', history_len=5)
     (output / 'collection.json').write_text(json.dumps({
-        'started_utc': started_utc, 'finished_utc': datetime.now(timezone.utc).isoformat(), 'counts': counts,
+        'started_utc': started_utc, 'finished_utc': datetime.now(timezone.utc).isoformat(),
+        'counts': counts, 'max_steps': max_steps,
         'game_ids': splits, 'converted_samples': manifest['samples'],
         'feedback_audit_sha256': sha256_file(output / 'feedback-audit.json'),
         'claim': 'expert environment recordings and contract audit, not trained-policy success or RL'}, indent=2), encoding='utf-8')
@@ -89,8 +91,10 @@ def main():
     parser.add_argument('--train', type=int, choices=range(1, 129), default=64)
     parser.add_argument('--validation', type=int, choices=range(1, 129), default=8)
     parser.add_argument('--test', type=int, choices=range(1, 129), default=8)
+    parser.add_argument('--max-steps', type=int, choices=range(1, 33), default=8)
     args = parser.parse_args()
-    collect(args.output, counts={s: getattr(args, s) for s in ('train', 'validation', 'test')})
+    collect(args.output, counts={s: getattr(args, s) for s in ('train', 'validation', 'test')},
+            max_steps=args.max_steps)
 
 
 if __name__ == '__main__':

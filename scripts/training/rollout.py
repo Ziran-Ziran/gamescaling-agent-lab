@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import json
 import math
 from pathlib import Path
+import re
 import statistics
 import time
 
@@ -33,12 +34,27 @@ def _append_json(path, value):
         stream.flush()
 
 
-def run_episode(policy, output, *, variant, seed, max_steps=8, history_len=0, clock=None):
+def make_schedule(games, seed_start, episodes_per_game):
+    require(isinstance(games, (list, tuple)) and games and len(set(games)) == len(games)
+            and all(game in GAME_IDS for game in games), 'unique supported games required')
+    require(type(seed_start) is int and seed_start >= 0 and type(episodes_per_game) is int
+            and 1 <= episodes_per_game <= 16, 'invalid rollout seed/count')
+    return [(variant, seed_start + list(GAME_IDS).index(variant) * 1000 + offset)
+            for variant in games for offset in range(episodes_per_game)]
+
+
+def run_episode(policy, output, *, variant, seed, max_steps=8, history_len=0, clock=None,
+                episode_tag=None):
     """Policy receives only a new prompt/RGB/history dictionary; never the game object."""
     require(type(history_len) is int and 0 <= history_len <= 5, 'invalid rollout history')
     root = Path(output)
     game = HeadlessGame(variant=variant, seed=seed, max_steps=max_steps,
                         **({'clock_ns': clock.ns, 'sleep': clock.sleep} if clock else {}))
+    if episode_tag is not None:
+        require(isinstance(episode_tag, str) and re.fullmatch('[A-Za-z0-9_-]{1,64}', episode_tag),
+                'invalid episode tag')
+        game.episode_id += '-' + episode_tag
+        game.clock_id = game.episode_id + '-perf-counter-ns'
     episode = {'schema_version': 1, 'episode_id': game.episode_id, 'game_id': GAME_IDS[variant],
                'game_build': 'procedural-point-grid-v1', 'task': variant,
                'system_prompt': game.system_prompt(), 'input_policy': 'player_observation',
@@ -152,14 +168,15 @@ def main():
     parser.add_argument('--decoder', choices=('full', 'first-key'), default='full')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--episodes-per-game', type=int, choices=range(1, 17), default=4)
+    parser.add_argument('--games', nargs='+', choices=tuple(GAME_IDS), default=list(GAME_IDS))
     parser.add_argument('--seed-start', type=int, default=3000)
     parser.add_argument('--max-steps', type=int, choices=range(1, 33), default=8)
     parser.add_argument('--history-len', type=int, choices=range(0, 6), default=0)
     parser.add_argument('--max-new-tokens', type=int, choices=range(1, 257), default=64)
     args = parser.parse_args()
-    require(args.seed_start >= 0, 'invalid seed start')
+    schedule = make_schedule(args.games, args.seed_start, args.episodes_per_game)
     args.output.mkdir(parents=True, exist_ok=False)
-    status = {'state': 'initializing', 'planned_episodes': 3 * args.episodes_per_game,
+    status = {'state': 'initializing', 'planned_episodes': len(schedule),
               'completed_episodes': 0, 'failed_episodes': 0, 'active_episode': None,
               'started_utc': datetime.now(timezone.utc).isoformat()}
     _write_status(args.output, status)
@@ -219,21 +236,19 @@ def _execute(args, status):
 
     episodes = []
     status['state'] = 'running'
-    for offset, variant in enumerate(GAME_IDS):
-        for seed in range(args.seed_start + offset * 1000,
-                          args.seed_start + offset * 1000 + args.episodes_per_game):
-            status['active_episode'] = f'{GAME_IDS[variant]}-seed-{seed}'
-            _write_status(args.output, status)
-            episode = run_episode(policy, args.output, variant=variant, seed=seed,
-                                  max_steps=args.max_steps, history_len=args.history_len)
-            with (args.output / 'episodes.jsonl').open('a', encoding='utf-8') as stream:
-                stream.write(json.dumps(episode) + '\n')
-            episodes.append(episode)
-            status.update(completed_episodes=len(episodes), active_episode=None)
-            _write_status(args.output, status)
-            print(json.dumps({'episode': episode['episode_id'], 'steps': len(episode['frames']),
-                              'reason': episode['frames'][-1]['terminal_reason'],
-                              'return': sum(f['reward'] for f in episode['frames'])}), flush=True)
+    for variant, seed in make_schedule(args.games, args.seed_start, args.episodes_per_game):
+        status['active_episode'] = f'{GAME_IDS[variant]}-seed-{seed}'
+        _write_status(args.output, status)
+        episode = run_episode(policy, args.output, variant=variant, seed=seed,
+                              max_steps=args.max_steps, history_len=args.history_len)
+        with (args.output / 'episodes.jsonl').open('a', encoding='utf-8') as stream:
+            stream.write(json.dumps(episode) + '\n')
+        episodes.append(episode)
+        status.update(completed_episodes=len(episodes), active_episode=None)
+        _write_status(args.output, status)
+        print(json.dumps({'episode': episode['episode_id'], 'steps': len(episode['frames']),
+                          'reason': episode['frames'][-1]['terminal_reason'],
+                          'return': sum(f['reward'] for f in episode['frames'])}), flush=True)
     summary = {'results': summarize_episodes(episodes),
                'feedback_audit': audit_feedback_episodes(episodes, args.output),
                'peak_cuda_allocated_mib': backend.torch.cuda.max_memory_allocated() / 1024 ** 2,

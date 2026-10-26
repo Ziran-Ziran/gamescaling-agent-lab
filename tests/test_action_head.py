@@ -4,7 +4,7 @@ import unittest
 
 from controller.control_core import to_action_text
 from scripts.training.action_head import (FORCED_PREFIX, LABELS, FirstKeyBackend, choose_class,
-                                          first_key_contract, template_action)
+                                          first_key_contract, forward_action_logits, template_action)
 
 try:
     import torch
@@ -31,6 +31,17 @@ class Tokenizer:
 
 
 class FirstKeyTests(unittest.TestCase):
+    @unittest.skipIf(torch is None, 'optional torch CPU dependency unavailable')
+    def test_shared_forward_allows_training_gradients_without_forcing_inference_mode(self):
+        parameter = torch.nn.Parameter(torch.tensor(1.))
+        backend = SimpleNamespace(torch=torch, processor=SimpleNamespace(tokenizer=Tokenizer()))
+        backend.model = lambda **inputs: SimpleNamespace(logits=(parameter * torch.arange(20.)).reshape(1, 1, 20))
+        logits, candidates = forward_action_logits(backend, {'input_ids': torch.tensor([[1, 2]])})
+        loss = -torch.nn.functional.log_softmax(logits[candidates].float(), dim=-1)[0]
+        loss.backward()
+        self.assertTrue(torch.isfinite(parameter.grad))
+        self.assertNotEqual(float(parameter.grad), 0.)
+
     def test_contract_requires_exact_prefix_and_unique_single_token_classes(self):
         prefix, candidates = first_key_contract(Tokenizer(), [1, 2])
         self.assertEqual(prefix, [3])

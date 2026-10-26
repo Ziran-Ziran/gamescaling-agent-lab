@@ -23,6 +23,7 @@
     "docs/training.md",
     "docs/latency.md",
     "docs/feedback.md",
+    "docs/feedback-learning.md",
     ".github/CODEOWNERS",
     "docs/local-scenes.md"
   ],

@@ -48,6 +48,26 @@ def template_action(label):
     return SafeAction((0., 0., 0.), ((label,) if label != 'noop' else (),) * 6)
 
 
+def forward_action_logits(backend, batch):
+    """Shared prefix/forward contract; caller chooses gradient or inference context."""
+    torch = backend.torch
+    require(set(batch) <= {'input_ids', 'attention_mask', 'mm_token_type_ids',
+                           'pixel_values', 'image_grid_thw'}, 'unsupported action-head model inputs')
+    require(batch['input_ids'].shape[0] == 1, 'action head requires batch one')
+    tail = batch['input_ids'][0, -64:].tolist()
+    prefix, candidates = first_key_contract(backend.processor.tokenizer, tail)
+    prefix_tensor = torch.tensor([prefix], device=batch['input_ids'].device,
+                                 dtype=batch['input_ids'].dtype)
+    extended = dict(batch)
+    extended['input_ids'] = torch.cat((batch['input_ids'], prefix_tensor), dim=1)
+    for key in ('attention_mask', 'mm_token_type_ids'):
+        if key in batch:
+            extra = torch.ones_like(prefix_tensor) if key == 'attention_mask' else torch.zeros_like(prefix_tensor)
+            extended[key] = torch.cat((batch[key], extra.to(batch[key].dtype)), dim=1)
+    logits = backend.model(**extended, use_cache=False, logits_to_keep=1).logits[0, -1]
+    return logits, candidates
+
+
 class FirstKeyBackend(RGBBackend):
     def generate(self, batch, *, max_new_tokens=64):
         # There is one forward/prediction and no autoregressive generation. max_new_tokens
@@ -55,21 +75,8 @@ class FirstKeyBackend(RGBBackend):
         self.synchronize()
         started = time.perf_counter()
         torch = self.torch
-        require(set(batch) <= {'input_ids', 'attention_mask', 'mm_token_type_ids',
-                               'pixel_values', 'image_grid_thw'}, 'unsupported action-head model inputs')
-        require(batch['input_ids'].shape[0] == 1, 'action head requires batch one')
-        tail = batch['input_ids'][0, -64:].tolist()
-        prefix, candidates = first_key_contract(self.processor.tokenizer, tail)
-        prefix_tensor = torch.tensor([prefix], device=batch['input_ids'].device,
-                                     dtype=batch['input_ids'].dtype)
-        extended = dict(batch)
-        extended['input_ids'] = torch.cat((batch['input_ids'], prefix_tensor), dim=1)
-        for key in ('attention_mask', 'mm_token_type_ids'):
-            if key in batch:
-                extra = torch.ones_like(prefix_tensor) if key == 'attention_mask' else torch.zeros_like(prefix_tensor)
-                extended[key] = torch.cat((batch[key], extra.to(batch[key].dtype)), dim=1)
         with torch.inference_mode():
-            logits = self.model(**extended, use_cache=False, logits_to_keep=1).logits[0, -1]
+            logits, candidates = forward_action_logits(self, batch)
             values = logits[candidates].float().tolist()
             top_token = int(logits.argmax())
         label, details = choose_class(values)
