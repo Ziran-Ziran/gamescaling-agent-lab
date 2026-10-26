@@ -10,6 +10,8 @@
 
 `bandit_train` 使用相同 RGB 首键 logits 比较专家分类监督和实际一步奖励目标，复用 LoRA/检查点/互斥包装器；方法、固定预算、真实训练和冻结失败见[反馈学习对照](feedback-learning.md)。奖励分支不读取教师动作作目标，但两组共享专家来源的 reset 语料，不能省略采集成本或称为顺序 RL。
 
+`audio_cue_data`、`audio_vision_train/eval/compare` 构成独立[音频派生双图试验](audio-vision.md)：采集后专属审计与原 RGB 转换双重验收，官方 0.8B 复用视觉编码器处理频谱图片，不声称支持原生音频。实际训练完成与没有融合收益的主评测同时记录；CPU 比较器不启动模型或 GPU。
+
 现有回环端点和模型身份校验保留。不要为方便接入开放公网或去掉 allowlist；云端脚本的 trust-remote-code 需要运行前审查。游戏输入不是这次工程拆分授权的内容。
 
 运行 README 中的离线测试与工程检查。依赖官方 gamescaling 包的测试在缺失时明确 skip；Windows 真实输入、截图、服务、模型和训练均需独立现场验收。

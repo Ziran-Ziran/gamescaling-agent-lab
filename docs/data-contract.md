@@ -34,13 +34,15 @@ controller 的运行协议仍以现有源码为准。RGB 轨迹审计/转换及�
 
 ## 可选音频窗口 v1
 
-独立的 `scripts.training.audio.read_audio` 校验玩家可观察的音频，不向现有 RGB GameScaling API 静默增加字段。它尚未集成进 RGB 轨迹转换器或官方模型；实际融合验收范围见 [训练说明](training.md)。
+独立的 `scripts.training.audio.read_audio` 校验玩家可观察的音频，原 RGB API 保持原合同。新的 [音频频谱图试验](audio-vision.md) 使用独立 audio index/manifest、双候选投影审计和现有模型多图编码器；这是固定音频到图像表示，不是给官方 API 增加原生波形字段。小型 CPU 融合冒烟另见 [训练说明](training.md)。
 
 有效通道声明 `present: true`、相对 `path`、文件 `sha256`、`sample_rate`（8,000–48,000Hz）、`channels: 1`、`encoding: pcm_s16le`、`clock_id`、`window_start_ns`、`window_end_ns`、`available_ns`。当前只接受单声道 PCM16 WAV，样本数与窗口时长相符、最长一秒；记录中的采样率/通道/位宽必须与 WAV 头一致。
 
 通道和 RGB 采样必须用同一 episode 单调时钟：`start < end <= available <= captured_ns`，默认窗口结束距 RGB 不超过 50ms。未来窗口、尚未可用、过期或时钟不一致返回 `present: false`、`missing_reason` 和空 waveform，不读取对应音频；格式、哈希、时长或路径损坏会报错。显式缺失通道为 `present: false` 加非空 `missing_reason`。
 
 有效静音保留 `present: true`，不能与缺失混同。固定特征为八个归一化频带能量、RMS 与过零率，缺失通道和静音都可产生零特征，但布尔掩码不同。单样本窗口过零率定义为 0，禁止产生 NaN。训练和推理必须同时携带掩码；未来片段不会补作历史上下文。
+
+双图分支使用另一个固定 STFT 表示，参数和版本见上文链接，不与十维 CPU 特征混称。`audio-cue-dual-color-v1` 的新观测投影必须专属重投影审计；内层 v1 物理账本不能单独证明双候选 RGB 正确。学生消息只含当前 RGB/频谱图和缺失掩码，教师有效目标、引擎 reset、动作标签与回报留在单独账本。两个 sensor 图属于同一当前时刻，不充作历史。音频原始文件和 RGB 像素均核对跨游戏集合泄漏。
 
 ## 无界面反馈账本
 
