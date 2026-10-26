@@ -24,6 +24,7 @@
     "docs/latency.md",
     "docs/feedback.md",
     "docs/feedback-learning.md",
+    "docs/audio-vision.md",
     ".github/CODEOWNERS",
     "docs/local-scenes.md"
   ],

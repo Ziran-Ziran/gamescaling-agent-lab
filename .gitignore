@@ -32,6 +32,7 @@
 !/docs/latency.md
 !/docs/feedback.md
 !/docs/feedback-learning.md
+!/docs/audio-vision.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env
