@@ -25,6 +25,7 @@ jobs:
       - run: python scripts/sync_engineering.py
       - run: python -m unittest discover -s tests -p "test_engineering*.py" -v
       - run: python -m unittest discover -s tests -p "test_repository_policy.py" -v
+      - run: python -m unittest discover -s tests -p "test_local_scene.py" -v
       - run: git show --format= --check HEAD
 
   controller-offline:

@@ -31,6 +31,10 @@ Linux/macOS 将解释器路径换成 `.venv/bin/python`。完整控制器测试�
 
 `experiments/*.json` 是**设计阶段的研究配置**，尚未绑定数据或训练/导航执行器；`validate_project.py` 只检查配置与数据边界，不启动实验。
 
+## 可选的本地场景
+
+已提供[两项目本地场景接入](docs/local-scenes.md)：共用源素材登记，各自维护独立 UE 实验副本；素材与本机绑定不上传 Git，也不构成训练或导航已验收。
+
 ## 工程入口
 
 - [架构与模块边界](docs/architecture.md)、[开发与平台限制](docs/development.md)

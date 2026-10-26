@@ -12,7 +12,7 @@ BLOCKED_PARTS = {
     'output', 'tmp', 'inputs', 'research', 'content', 'media', 'saved',
     'intermediate', 'binaries', 'deriveddatacache', 'node_modules',
     '__pycache__', '.venv', 'venv', '.ssh', '.aws', '.azure', '.config',
-    '.git', 'weights', 'checkpoints', 'datasets', 'logs',
+    '.git', 'weights', 'checkpoints', 'datasets', 'logs', 'local',
 }
 PATTERNS = {
     'private key': re.compile(rb'-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----'),

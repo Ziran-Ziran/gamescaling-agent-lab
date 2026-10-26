@@ -25,6 +25,7 @@
 !/docs/repository-policy.md
 !/docs/migration.md
 !/docs/shared-engineering.md
+!/docs/local-scenes.md
 !/docs/data-contract.md
 !/docs/research-plan.md
 
@@ -90,3 +91,6 @@ DerivedDataCache/
 *.tgz
 .DS_Store
 Thumbs.db
+
+# Extracted scenes, local catalogs, bindings and per-project UE workspaces.
+/local/

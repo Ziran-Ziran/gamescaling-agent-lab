@@ -17,3 +17,5 @@
 `python scripts/check_repository.py` 只检查 Git 暂存区实际内容。全新仓库应在暂存源码后运行；正常克隆已存在完整 index。
 
 这些检查都不启动训练、GPU、云资源、UE、游戏输入或模型下载。实验输出留在忽略目录 output/，不得把旧工程的绝对路径当本机事实。
+
+本地蒙德城区素材接入与独立 UE 副本见 [场景接入说明](local-scenes.md)。

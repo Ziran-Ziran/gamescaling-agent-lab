@@ -9,3 +9,5 @@ GameScaling Agent Lab 只承担GameScaling 模型训练、多模态输入与低�
 - [迁移](migration.md)：固定来源与旧工程的连续性。
 - [共享维护](shared-engineering.md)：可独立克隆的版本化工程副本。
 - [发布规则](repository-policy.md)：源码白名单与 GitHub 约定。
+
+本地蒙德城区素材接入与独立 UE 副本见 [场景接入说明](local-scenes.md)。

@@ -44,10 +44,12 @@ class RepositoryPolicyTests(unittest.TestCase):
         self.assertEqual(self.check().returncode, 0)
 
     def test_force_added_data_is_blocked_even_if_policy_allows_directory(self):
-        self.policy['allowed_trees'].append('output/')
-        self.stage_policy()
-        self.stage('output/private.txt', b'local data\n')
-        self.assertNotEqual(self.check().returncode, 0)
+        for folder in ('output', 'local'):
+            with self.subTest(folder=folder):
+                self.policy['allowed_trees'].append(folder + '/')
+                self.stage_policy()
+                self.stage(folder + '/private.txt', b'local data\n')
+                self.assertNotEqual(self.check().returncode, 0)
 
     def test_staged_secret_is_detected_without_echoing_it(self):
         secret = b'gh' + b'p_' + b'X' * 36

@@ -16,3 +16,16 @@ python scripts/sync_engineering.py --source-root <reviewed-source-clone> --apply
 同步只操作内置固定文件列表；拒绝路径跳转、符号链接、损坏源哈希和未经清单更新的本地改动，预检全部通过后才写入。不会拉网络、修改发布策略或改领域源码。
 
 维护者更新流程：在来源仓库 PR 修改共享文件与相应测试；将 bundle version 升版，按固定文件列表更新清单哈希；通过 CI 后，再在另一仓库显式同步并 PR。消费者可以暂缓升级，仍独立可运行。不得为让检查通过而删除文件或放宽敏感数据规则。
+
+Bundle 1.1.0 增加本地场景接入脚本、合成测试和使用说明；只共用接入工具，不把任何游戏资产加入 bundle。
+
+## 从 1.0.0 的 11 文件升级到 1.1.0 的 14 文件
+
+旧版同步器不认识新增文件，需直接运行经过审查的新版本同步器，显式指定目标旧克隆；不要先手工替换目标文件破坏旧哈希。
+
+```powershell
+python <reviewed-new-source>/scripts/sync_engineering.py --root <old-target-clone> --source-root <reviewed-new-source>
+python <reviewed-new-source>/scripts/sync_engineering.py --root <old-target-clone> --source-root <reviewed-new-source> --apply
+```
+
+新同步器识别两种固定清单，校验旧副本后增加固定的三个新文件；若新增文件位置已经有未登记的本地文件，失败并保留该文件。它不会移除已有 bundle 文件。消费者的发布白名单、README 和 CI 仍由各项目 PR 单独更新，bundle 同步不替代领域仓库迁移。
