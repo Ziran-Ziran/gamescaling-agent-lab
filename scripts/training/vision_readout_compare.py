@@ -19,7 +19,7 @@ def comparable_identity(identity):
             if key not in ('arm','architecture','initialization_fingerprint')}
 
 
-def audit_feature_file(evidence,root,policy,missing,feature_dim):
+def audit_feature_file(evidence,root,policy,missing,feature_dim,*,expected_visual_calls=None):
     import torch
     root=Path(root).resolve()
     reference=evidence['feature_file']
@@ -32,7 +32,11 @@ def audit_feature_file(evidence,root,policy,missing,feature_dim):
     require(inputs['model_text_used'] is False and inputs['input_tokens']==0 and inputs['prompt_sha256'] is None,
             'feature readout must not receive model text')
     require(type(bundle['present']) is bool and bundle['present']==inputs['present'],'feature presence mismatch')
-    require(inputs['actual_visual_calls']==(2 if bundle['present'] else 1),'actual visual call count differs from sensor mask')
+    maximum=2 if bundle['present'] else 1
+    expected=maximum if expected_visual_calls is None else expected_visual_calls
+    require(type(expected) is int and 1<=expected<=maximum
+            and type(inputs['actual_visual_calls']) is int and inputs['actual_visual_calls']==expected,
+            'actual visual call count differs from sensor mask/intervention')
     for key,pixels in (('rgb',inputs['input_rgb_pixel_sha256']),('audio',inputs['input_spectral_pixel_sha256'])):
         value=bundle[key]
         require(value.dtype==torch.float32 and value.shape==(feature_dim,) and bool(torch.isfinite(value).all()),

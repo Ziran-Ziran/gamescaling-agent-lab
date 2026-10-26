@@ -26,6 +26,7 @@
     "docs/feedback-learning.md",
     "docs/audio-vision.md",
     "docs/vision-readout.md",
+    "docs/spectral-cache.md",
     ".github/CODEOWNERS",
     "docs/local-scenes.md"
   ],

@@ -29,6 +29,12 @@ class ReadoutEvidenceTests(unittest.TestCase):
                                    for key,value in (('rgb',rgb),('audio',audio))},
                 'head_record':record,'class_record':{'raw_class_logits':dict(zip(('W','A','S','D','noop'),logits.tolist()))}}
             self.assertEqual(audit_feature_file(evidence,root,policy,torch.zeros(4),4),0.)
+            cached=copy.deepcopy(evidence)
+            cached['inputs']['actual_visual_calls']=1
+            with self.assertRaisesRegex(ValueError,'call count'):
+                audit_feature_file(cached,root,policy,torch.zeros(4),4)
+            self.assertEqual(audit_feature_file(cached,root,policy,torch.zeros(4),4,
+                                               expected_visual_calls=1),0.)
             bad=copy.deepcopy(evidence)
             bad['inputs']['actual_visual_calls']=1
             with self.assertRaisesRegex(ValueError,'call count'):
