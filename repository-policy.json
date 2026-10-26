@@ -25,6 +25,7 @@
     "docs/feedback.md",
     "docs/feedback-learning.md",
     "docs/audio-vision.md",
+    "docs/vision-readout.md",
     ".github/CODEOWNERS",
     "docs/local-scenes.md"
   ],

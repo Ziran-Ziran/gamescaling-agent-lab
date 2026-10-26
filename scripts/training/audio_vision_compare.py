@@ -24,10 +24,11 @@ def require_complete(status, planned):
             and status['active_episode'] is None, 'comparison requires every planned episode complete and no failures')
 
 
-def audit_policy_inputs(episode, root, condition):
+def audit_policy_inputs(episode, root, condition, *, prediction_kind='first-key-token'):
     """Recompute actual sensor interventions independently of inference logs."""
     from PIL import Image
     root = Path(root).resolve()
+    require(prediction_kind in ('first-key-token','feature-readout'),'unsupported prediction contract')
     spec = episode['cue_reset']
     for frame in episode['frames']:
         policy = frame['policy']
@@ -65,7 +66,9 @@ def audit_policy_inputs(episode, root, condition):
         values = policy['class_record']['raw_class_logits']
         label, _ = choose_class([values[k] for k in ('W','A','S','D','noop')])
         require(policy['selected_class'] == label
-                and policy['generated_tokens'] == 0 and policy['predicted_tokens'] == 1
+                and policy['generated_tokens'] == 0
+                and policy['predicted_tokens'] == (1 if prediction_kind=='first-key-token' else 0)
+                and (prediction_kind=='first-key-token' or policy.get('predicted_classes')==1)
                 and frame['actual_action']['text'] == to_action_text(template_action(label)),
                 'recorded actual action differs from five-class policy')
 
