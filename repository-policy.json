@@ -28,6 +28,7 @@
     "docs/vision-readout.md",
     "docs/spectral-cache.md",
     "docs/retention.md",
+    "docs/audio-batch.md",
     ".github/CODEOWNERS",
     "docs/local-scenes.md"
   ],

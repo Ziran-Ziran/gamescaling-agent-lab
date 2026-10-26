@@ -12,6 +12,8 @@
 
 `audio_cue_data`、`audio_vision_train/eval/compare` 构成独立[音频派生双图试验](audio-vision.md)：采集后专属审计与原 RGB 转换双重验收，官方 0.8B 复用视觉编码器处理频谱图片，不声称支持原生音频。实际训练完成与没有融合收益的主评测同时记录；CPU 比较器不启动模型或 GPU。
 
+`audio_batch_train/audit/eval/compare` 在原五类首键解码器上提供[平衡四例梯度累积实验](audio-batch.md)，严格固定两组样本与缺失曝光；CPU 审计重建训练输入/损失、检查点和全部24个导出张量。`audio_batch_retention` 将次要 RGB 回合绑定到相同最终 cohort；不能用低训练损失替代未见任务和保留结果。
+
 `vision_readout_data/train/eval/compare` 提供独立[冻结视觉读出](vision-readout.md)：GPU 只提取固定视觉表示，CPU 训练新任务头，严格绑定训练标准化与特征来源；实际回合保存数值特征后，CPU 可精确重算头 logits 并审计动作/反馈。它不使用原语言解码器，质量与成本单独评测。
 
 `vision_cache_benchmark/compare` 在同一个固定视觉读出上交替测量无缓存和像素精确的频谱特征缓存，见[缓存对照](spectral-cache.md)。缓存前仍检查原始音频的因果窗口；CPU 审计独立重建 LRU、逐位重算头输出，并核对实际回合时钟与反馈。离线处理和观测到动作的时间分别报告。
