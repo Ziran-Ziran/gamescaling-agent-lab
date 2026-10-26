@@ -28,6 +28,7 @@
 !/docs/local-scenes.md
 !/docs/data-contract.md
 !/docs/research-plan.md
+!/docs/training.md
 
 # Credentials, private configuration and generated artifacts (at any depth).
 .env

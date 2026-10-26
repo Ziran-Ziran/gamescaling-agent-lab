@@ -4,7 +4,7 @@
 
 官方 GameScaling 客户端、权重、GPU 推理运行时独立配置，不随仓库提供。当前控制器仍保留历史 WSL/上游路径默认值，集中在 backends.py、wsl_bridge.py、evaluate_saved.py；policy_worker.py 的规则仍针对原神短距离探索，不能当成通用任务 API。迁移不自动启动或重新配置任何服务。
 
-本轮没有安装训练框架、选择 LoRA 实现或增加训练脚本。先按 research-plan.md 固定基线、数据许可、按游戏划分和预算，再实现数据转换、SFT/LoRA、后训练与多模态适配。训练环境的 torch/CUDA/驱动/上游版本需在独立运行中记录并锁定，不能把离线依赖文件当训练锁文件。
+训练使用单独的 `requirements/training.txt` 和项目专用 venv，入口为 `python -m scripts.training.data`、`synthetic`、`evaluate`、`saved_probe`、`train`，详见 [training.md](training.md)。现有共享推理环境保持只读，新版 Transformers/PEFT 在训练 venv 中覆盖；不在该 overlay 中运行旧版 vLLM。按 research-plan 固定基线、数据许可、划分与预算；真实 torch/CUDA/驱动/模型文件哈希记录在本地运行清单，控制器依赖不能当训练锁文件。
 
 现有回环端点和模型身份校验保留。不要为方便接入开放公网或去掉 allowlist；云端脚本的 trust-remote-code 需要运行前审查。游戏输入不是这次工程拆分授权的内容。
 
