@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://github.com/Ziran-Ziran/gamescaling-npc-lab",
+  "source_commit": "46e75f16af30d5eb52ec6833a6dff3b3703ddc61",
+  "strategy": "source-only snapshot; no Git history, ignored files, assets or data copied",
+  "files": [
+    {
+      "path": ".editorconfig",
+      "source_path": ".editorconfig",
+      "source_sha256": "c5fb749272d8733f90f2357b4c50cc1edb12558bfc7d1c705d9b7553da6bca82"
+    },
+    {
+      "path": ".gitattributes",
+      "source_path": ".gitattributes",
+      "source_sha256": "13e159fdb80720512f57c5fa62ac3969fec5971c6a07c0f110b5e35b9b6c511e"
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "source_path": ".github/CODEOWNERS",
+      "source_sha256": "fa938754ac65210f81183817e2e86f79871dad286bc1d1966814dc55fbdfdd8d"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "source_path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "source_sha256": "3fca65cc7130a890df413b199642161e22fa68d796e3c32661af62b083e395f3"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "source_path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "source_sha256": "5a7519274d26f9d1d62ec31289c0341043f0db2435231da3c0049d7aa37f68c9"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "source_path": ".github/dependabot.yml",
+      "source_sha256": "40cb84ed548342abdf6c9bcf0395f299eac338f215832b3e4e2965d812f96cc8"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "source_path": ".github/pull_request_template.md",
+      "source_sha256": "a165dc40c801fddf17c7d1af508d8464b2f71e4793b402b425a0a9169ab328d0"
+    },
+    {
+      "path": "SECURITY.md",
+      "source_path": "SECURITY.md",
+      "source_sha256": "e0cbbd3914aebb8dc3841d39e704ee40b1eb904d4d264258f6d41919151b1c95"
+    },
+    {
+      "path": "controller/README.md",
+      "source_path": "controller/README.md",
+      "source_sha256": "809782bbca3ca2fd6def5f77d0b95d7a9f164d7a11eee3f10700cc685e7035be"
+    },
+    {
+      "path": "controller/__init__.py",
+      "source_path": "controller/__init__.py",
+      "source_sha256": "c8a645aa5389228021df471071470e5788831c16ee01ab8765a0fb513d3766f8"
+    },
+    {
+      "path": "controller/automatic.py",
+      "source_path": "controller/automatic.py",
+      "source_sha256": "e737ca75c84fc0c1b68e3d1e644ed002588e9c18e19c293647a6b97c40322383"
+    },
+    {
+      "path": "controller/backends.py",
+      "source_path": "controller/backends.py",
+      "source_sha256": "daa424e17e1eb568e63f489b65c3ddd1875215cfc110a24ec9feb1d93da3c4ee"
+    },
+    {
+      "path": "controller/bounded_session.py",
+      "source_path": "controller/bounded_session.py",
+      "source_sha256": "21f7212d4468be5886595895680dc66646cb39e3b61868c67bf0d21b6c76be94"
+    },
+    {
+      "path": "controller/cloud/download_9b.py",
+      "source_path": "controller/cloud/download_9b.py",
+      "source_sha256": "606e0b6df6f5253aa0add2e7a1977d9ef435adc3af74de1ca2b6e9a6186560f0"
+    },
+    {
+      "path": "controller/cloud/preflight.sh",
+      "source_path": "controller/cloud/preflight.sh",
+      "source_sha256": "11755399d72e30b44ddf39226999713c8780a5e59b079c8f1f44c56c360a2949"
+    },
+    {
+      "path": "controller/cloud/serve_9b.sh",
+      "source_path": "controller/cloud/serve_9b.sh",
+      "source_sha256": "3e09d178d308a7f5556674b3629fce05e45c2cc9a988f232fbe06b961acf25af"
+    },
+    {
+      "path": "controller/control_core.py",
+      "source_path": "controller/control_core.py",
+      "source_sha256": "416cf5982ba2a6a91e7ce835de4d2ddc59ac74253fbac3ccae7dde21b1ad5b6b"
+    },
+    {
+      "path": "controller/evaluate_saved.py",
+      "source_path": "controller/evaluate_saved.py",
+      "source_sha256": "c9b57001eb1e348a4b0841d78a26788279ba918861bbc5f4e49d9e7d5b67a9dc"
+    },
+    {
+      "path": "controller/policy_worker.py",
+      "source_path": "controller/policy_worker.py",
+      "source_sha256": "6969ab185f16c7ed75de420912fdbbdb6cb13a93d0fc25dfaccb10089bafcdb7"
+    },
+    {
+      "path": "controller/run_agent.py",
+      "source_path": "controller/run_agent.py",
+      "source_sha256": "890304a3fd1f47eee214f050a430cdbf78aaa73a9630c77d60d47cd95829ada2"
+    },
+    {
+      "path": "controller/supervisor.py",
+      "source_path": "controller/supervisor.py",
+      "source_sha256": "f80cfd20a05f887292e657fcb505eb3006fbed11efc29021737d49a877509d52"
+    },
+    {
+      "path": "controller/telemetry.py",
+      "source_path": "controller/telemetry.py",
+      "source_sha256": "565a6fb75cd485fe7721717c518523a077c0a58297af50176e4f8a6898cbab8b"
+    },
+    {
+      "path": "controller/windows_adapter.py",
+      "source_path": "controller/windows_adapter.py",
+      "source_sha256": "4ed49d79976a8068038d8acae3625bd7b9f180cff58e232420aa032e9624df4d"
+    },
+    {
+      "path": "controller/wsl_bridge.py",
+      "source_path": "controller/wsl_bridge.py",
+      "source_sha256": "d66540fab4ebd254986b9e0ed858364a989149272a76973b4f51955471c6b948"
+    },
+    {
+      "path": "requirements/controller.txt",
+      "source_path": "requirements/controller.txt",
+      "source_sha256": "2124dc514098e22bd80c5eed76beda694ad5edc621f89371071f32eebd0dcb8e"
+    },
+    {
+      "path": "tests/test_automatic.py",
+      "source_path": "tests/test_automatic.py",
+      "source_sha256": "b33e0e751550d1e23b227684d619f882dc545176f62396789525614ba4e428a6"
+    },
+    {
+      "path": "tests/test_backends.py",
+      "source_path": "tests/test_backends.py",
+      "source_sha256": "1091853e7b068612a225956d0e5b4d846a3d624d59e153479af17923a099b6b4"
+    },
+    {
+      "path": "tests/test_bounded_session.py",
+      "source_path": "tests/test_bounded_session.py",
+      "source_sha256": "d39ab1aba9d50ac93e2222c273eee5c71eedf41b433ed5f96349ba163843e34a"
+    },
+    {
+      "path": "tests/test_bridge.py",
+      "source_path": "tests/test_bridge.py",
+      "source_sha256": "c7be581bc458b9950b38a4056a1f325653f69ea88ee15b2321e75b18e3ca242e"
+    },
+    {
+      "path": "tests/test_cloud_download.py",
+      "source_path": "tests/test_cloud_download.py",
+      "source_sha256": "ef34f90e3fb92f53e5c75141f2efe369ef7c55be756c83e3142ed25df8046eff"
+    },
+    {
+      "path": "tests/test_control_core.py",
+      "source_path": "tests/test_control_core.py",
+      "source_sha256": "92a4ff59c06c24bb20dc2e2959b0ba7e940b8fdf36811b037fed66e4453d3156"
+    },
+    {
+      "path": "tests/test_evaluate_saved.py",
+      "source_path": "tests/test_evaluate_saved.py",
+      "source_sha256": "46456801df4b33340c3555152e89bdfb4f3e748a99a3533c4d79b11abf95763a"
+    },
+    {
+      "path": "tests/test_execution_record.py",
+      "source_path": "tests/test_execution_record.py",
+      "source_sha256": "a66d068311f7d1ffa79f09d5d044aec31f1f7ab0afed030d42df1414d4900522"
+    },
+    {
+      "path": "tests/test_repository_policy.py",
+      "source_path": "tests/test_repository_policy.py",
+      "source_sha256": "5d89e45d37db9fa34a15815fb7eaa5d1122200ba4c47ab11e454424cf7327f4d"
+    },
+    {
+      "path": "tests/test_run_status.py",
+      "source_path": "tests/test_run_status.py",
+      "source_sha256": "5a4bf8f35c5aeba99c2a7f3e7531995168b41b247e7d2534510f940e1f73d368"
+    },
+    {
+      "path": "tests/test_startup_activation.py",
+      "source_path": "tests/test_startup_activation.py",
+      "source_sha256": "2b7d5af15c5c88982818b3603f4c3c8438b1597e5d2ba15f3add7606e20d08f5"
+    },
+    {
+      "path": "tests/test_supervisor.py",
+      "source_path": "tests/test_supervisor.py",
+      "source_sha256": "a9537c388980c2e1ed4c75c48a3f19b709d9c796badb3e27e8f185134ffbbbd3"
+    },
+    {
+      "path": "tests/test_windows_adapter.py",
+      "source_path": "tests/test_windows_adapter.py",
+      "source_sha256": "eca20861e968cacd163761071d8bd54fbcc50711d646ba63b15014833bc78bb8"
+    }
+  ],
+  "adapted_files": [
+    "tests/test_repository_policy.py",
+    "controller/README.md"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "project": "gamescaling",
+  "allowed_files": [
+    ".gitignore",
+    ".gitattributes",
+    ".editorconfig",
+    "README.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "NOTICE.md",
+    "AGENTS.md",
+    "repository-policy.json",
+    "docs/README.md",
+    "docs/architecture.md",
+    "docs/development.md",
+    "docs/roadmap.md",
+    "docs/repository-policy.md",
+    "docs/migration.md",
+    "docs/shared-engineering.md",
+    "docs/data-contract.md",
+    "docs/research-plan.md",
+    ".github/CODEOWNERS"
+  ],
+  "allowed_trees": [
+    ".github/",
+    "scripts/",
+    "tests/",
+    "requirements/",
+    "experiments/",
+    "engineering/",
+    "controller/"
+  ]
+}

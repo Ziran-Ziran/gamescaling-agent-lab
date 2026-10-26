@@ -1,0 +1,18 @@
+# Agent 与协作约定
+
+## 当前项目
+
+本仓库只研究GameScaling 模型训练、多模态输入与低延迟决策。兄弟项目是 `sitp-ue5-spatial-lab`；不得重新引入两者必须一起运行的设计。
+
+## 环境与操作
+
+- 新会话、恢复或环境切换后，先只读确认主机名、OS、当前用户与工作目录，再核实实际工具路径和版本；不得推定另一台设备的环境。
+- 先读 README、CONTRIBUTING、docs/repository-policy.md 和 docs/roadmap.md。
+- 默认只做离线验证；训练、游戏输入、UE 采集、云资源、模型下载和长时间 GPU 任务需要对应的用户授权。
+- 不复制权重、资产、游戏截图、真实数据、私人日志、论文全文或凭据到 Git；不要强制添加忽略文件。
+- 不自动增加许可证。第三方代码、资产与模型分别核对授权。
+- 区分已实现、离线测试、现场验收和规划；不把合同验证当成模型能力验证。
+- 推理输入与评测真值隔离；训练期特权信息须单独声明，不能流入只允许玩家观测的评测。
+- 改坐标、时间、标定、输入模态或动作协议时，同步 docs/data-contract.md 和相应测试。
+- 完成前运行 README 的测试命令、`python scripts/validate_project.py`、`python scripts/sync_engineering.py`、`python scripts/check_repository.py`、`git diff --check`，报告跳过和平台限制。
+- 共享工程文件按 engineering/manifest.json 管理；修改后按 docs/shared-engineering.md 升版并校验，不能靠兄弟仓库的未提交代码才能运行。

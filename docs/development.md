@@ -1,0 +1,19 @@
+# 开发与复现
+
+推荐 Python 3.12。离线控制器依赖在 requirements/controller.txt；requirements/dev.txt 仅引用该文件。完整控制器以 Windows 为准，Linux CI 只运行不依赖 Windows API 的工程测试。
+
+官方 GameScaling 客户端、权重、GPU 推理运行时独立配置，不随仓库提供。当前控制器仍保留历史 WSL/上游路径默认值，集中在 backends.py、wsl_bridge.py、evaluate_saved.py；policy_worker.py 的规则仍针对原神短距离探索，不能当成通用任务 API。迁移不自动启动或重新配置任何服务。
+
+本轮没有安装训练框架、选择 LoRA 实现或增加训练脚本。先按 research-plan.md 固定基线、数据许可、按游戏划分和预算，再实现数据转换、SFT/LoRA、后训练与多模态适配。训练环境的 torch/CUDA/驱动/上游版本需在独立运行中记录并锁定，不能把离线依赖文件当训练锁文件。
+
+现有回环端点和模型身份校验保留。不要为方便接入开放公网或去掉 allowlist；云端脚本的 trust-remote-code 需要运行前审查。游戏输入不是这次工程拆分授权的内容。
+
+运行 README 中的离线测试与工程检查。依赖官方 gamescaling 包的测试在缺失时明确 skip；Windows 真实输入、截图、服务、模型和训练均需独立现场验收。
+
+## 工程配置与共享工具
+
+`python scripts/validate_project.py` 校验设计配置、评测划分及特权信息声明，不读取真实数据，不检查实际模型行为。
+`python scripts/sync_engineering.py` 检查本仓库的共享文件与锁定哈希一致；更新流程见 shared-engineering.md。
+`python scripts/check_repository.py` 只检查 Git 暂存区实际内容。全新仓库应在暂存源码后运行；正常克隆已存在完整 index。
+
+这些检查都不启动训练、GPU、云资源、UE、游戏输入或模型下载。实验输出留在忽略目录 output/，不得把旧工程的绝对路径当本机事实。

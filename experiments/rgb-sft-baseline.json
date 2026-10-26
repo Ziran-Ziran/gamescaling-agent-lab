@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "project": "gamescaling",
+  "name": "rgb-sft-baseline",
+  "status": "design",
+  "runner_implemented": false,
+  "seed": 0,
+  "stage": "sft",
+  "observations": [
+    "rgb"
+  ],
+  "training_only_observations": [],
+  "evaluation_observations": [
+    "rgb"
+  ],
+  "input_policy": "player_observation",
+  "split_unit": "game",
+  "split_ids": {
+    "train": [
+      "synthetic_fixture_train"
+    ],
+    "validation": [
+      "synthetic_fixture_validation"
+    ],
+    "test": [
+      "synthetic_fixture_test"
+    ]
+  },
+  "dataset_bound": false,
+  "metrics": [
+    "task_success_rate",
+    "action_parse_rate",
+    "observation_to_execution_p95_ms",
+    "stale_action_rate"
+  ]
+}
