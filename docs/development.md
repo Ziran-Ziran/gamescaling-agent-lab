@@ -14,6 +14,8 @@
 
 `vision_readout_data/train/eval/compare` 提供独立[冻结视觉读出](vision-readout.md)：GPU 只提取固定视觉表示，CPU 训练新任务头，严格绑定训练标准化与特征来源；实际回合保存数值特征后，CPU 可精确重算头 logits 并审计动作/反馈。它不使用原语言解码器，质量与成本单独评测。
 
+`vision_cache_benchmark/compare` 在同一个固定视觉读出上交替测量无缓存和像素精确的频谱特征缓存，见[缓存对照](spectral-cache.md)。缓存前仍检查原始音频的因果窗口；CPU 审计独立重建 LRU、逐位重算头输出，并核对实际回合时钟与反馈。离线处理和观测到动作的时间分别报告。
+
 现有回环端点和模型身份校验保留。不要为方便接入开放公网或去掉 allowlist；云端脚本的 trust-remote-code 需要运行前审查。游戏输入不是这次工程拆分授权的内容。
 
 运行 README 中的离线测试与工程检查。依赖官方 gamescaling 包的测试在缺失时明确 skip；Windows 真实输入、截图、服务、模型和训练均需独立现场验收。

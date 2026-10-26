@@ -65,3 +65,4 @@ jobs:
       - run: python -m unittest discover -s tests -p test_feedback_learning.py -v
       - run: python -m unittest discover -s tests -p 'test_audio_vision*.py' -v
       - run: python -m unittest discover -s tests -p 'test_vision*.py' -v
+      - run: python -m unittest discover -s tests -p test_spectral_cache.py -v
