@@ -64,7 +64,7 @@ $PY scripts/resource_guard.py --lock "$GPU_LOCK" --seconds 600 -- \
 
 ## 训练、恢复与评测含义
 
-LoRA 只更新文本 full-attention 中的 q_proj/v_proj，默认 rank 8、alpha 16、dropout 0；视觉骨干和其他参数冻结。batch size 1，AdamW，梯度范数上限 1。损失只覆盖当前 assistant 的动作补全；系统提示、RGB token、历史动作均被掩码。仅计算动作区间的 logits，避免为整段提示分配大词表 logits。当前不包含 RL 或额外模态训练。
+LoRA 只更新文本 full-attention 中的 q_proj/v_proj，默认 rank 8、alpha 16、dropout 0；视觉骨干和其他参数冻结。batch size 1，AdamW，梯度范数上限 1。损失只覆盖当前 assistant 的动作补全；系统提示、RGB token、历史动作均被掩码。仅计算动作区间的 logits，避免为整段提示分配大词表 logits。当前官方 GameScaling 后端只接受 RGB；下面的小模型音频试验是独立冒烟，不包含 RL。
 
 检查点包含可训练权重、优化器、Python/PyTorch/CUDA RNG、步数与模型/数据/超参数/版本身份。完成后写哈希清单；哈希或身份不匹配拒绝恢复。可复现数据顺序按 seed 和 epoch 生成。标准 PEFT adapter 随检查点保存，基座权重不复制。CPU 测试验证下一步恢复结果与不中断训练相同；真实 GPU 的相等性须另外实测。
 
@@ -94,11 +94,36 @@ LoRA 只更新文本 full-attention 中的 q_proj/v_proj，默认 rank 8、alpha
 
 适配前后的同一 Doom 保存图 probe 均输出合法开火动作，但鼠标位移从 `(10,-1)` 变为 `(0,0)`，因此严格动作一致性为 false。该静态输出已发生漂移；没有环境任务真值，不能把它解释成遗忘，也不能声称原能力保持。此 probe 不参与 LoRA 训练。
 
+## 小模型音频融合冒烟
+
+```bash
+$PY -m scripts.training.audio_smoke --output output/audio-fusion-smoke \
+  --seed 20261026 --steps 200
+```
+
+该命令仅用 CPU，内部预算 60 秒，不启动 GPU 或桌面。先在合成红/蓝 RGB 特征上训练小型分类器，再冻结 RGB 分支；音频为 200ms、16kHz 的本地生成正弦波，RGB 为与目标独立的灰度干扰图。固定 FFT 八频带能量、RMS、过零率共十维特征，训练 418 参数的 MLP 残差融合分支。掩码为 false 时残差严格归零；没有训练任何 GameScaling 音频编码器或 Qwen 模型。
+
+合成游戏 ID、episode 和像素/音频文件哈希按集合隔离；三个集合仍共享同一人工频率规则，因此不能证明真实音频或跨游戏泛化。生成媒体、逐样本合同、数据哈希、模型 state 和结果全部保留本地。
+
+2026-10-26 seed 20261026 的首次 CPU 运行共 200 步，约 15.1 秒，训练损失由约 0.8007 降至最后一步约 0.000486。冻结测试集 64 个样本的分类结果：
+
+| 输入条件 | 合成分类准确率 |
+|---|---:|
+| RGB 单独 | 48.44% |
+| RGB + 对齐音频 | 100% |
+| 音频显式缺失 | 48.44% |
+| 相反类别音频交换 | 0% |
+| 未来音频窗口（全部被掩码） | 48.44% |
+| 高斯噪声替换音频特征 | 56.25% |
+
+最后一行是十维特征的数学扰动，不是原始波形噪声的鲁棒性实验。128 个经过变换的 RGB 预训练颜色样本在缺失音频时输出保持一致；这是冻结分支和残差掩码的设计不变性检查，不是独立游戏能力保持集。此试验验证了因果对齐、掩码和实际可学习融合路径，不能声称官方模型理解音频或真实游戏能力提升。
+
 ## 验证与发布
 
 ```bash
 python -m unittest discover -s tests -p 'test_training*.py' -v
 python -m unittest discover -s tests -p test_resource_guard.py -v
+python -m unittest discover -s tests -p test_audio_contract.py -v
 python scripts/validate_project.py
 python scripts/sync_engineering.py
 python scripts/check_repository.py
