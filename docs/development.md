@@ -6,6 +6,8 @@
 
 训练使用单独的 `requirements/training.txt` 和项目专用 venv，入口为 `python -m scripts.training.data`、`synthetic`、`evaluate`、`saved_probe`、`train`，详见 [training.md](training.md)。现有共享推理环境保持只读，新版 Transformers/PEFT 在训练 venv 中覆盖；不在该 overlay 中运行旧版 vLLM。按 research-plan 固定基线、数据许可、划分与预算；真实 torch/CUDA/驱动/模型文件哈希记录在本地运行清单，控制器依赖不能当训练锁文件。
 
+自有玩具任务提供 `collect_headless`、`feedback` 和 RGB `rollout` 入口，见[环境反馈与适配](feedback.md)。教师引擎真值只用于审计/采集，模型回合只接收 RGB、固定规则和实际历史；推理期间暂停，不能把本地动作窗口称为在线实时游戏验收。
+
 现有回环端点和模型身份校验保留。不要为方便接入开放公网或去掉 allowlist；云端脚本的 trust-remote-code 需要运行前审查。游戏输入不是这次工程拆分授权的内容。
 
 运行 README 中的离线测试与工程检查。依赖官方 gamescaling 包的测试在缺失时明确 skip；Windows 真实输入、截图、服务、模型和训练均需独立现场验收。
