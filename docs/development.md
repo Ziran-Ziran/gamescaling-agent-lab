@@ -16,6 +16,8 @@
 
 `vision_cache_benchmark/compare` 在同一个固定视觉读出上交替测量无缓存和像素精确的频谱特征缓存，见[缓存对照](spectral-cache.md)。缓存前仍检查原始音频的因果窗口；CPU 审计独立重建 LRU、逐位重算头输出，并核对实际回合时钟与反馈。离线处理和观测到动作的时间分别报告。
 
+`rollout_compare` 和 `retention_compare` 对既有 RGB 首键回合进行[策略保留审计](retention.md)，分别提供通用两组比较与固定五策略矩阵。它们只运行 CPU 重放和记录核验，约束默认规则/原始 logits/实际动作/回报，并在原模型没有成功样本时明确标记保留比例不具信息性。
+
 现有回环端点和模型身份校验保留。不要为方便接入开放公网或去掉 allowlist；云端脚本的 trust-remote-code 需要运行前审查。游戏输入不是这次工程拆分授权的内容。
 
 运行 README 中的离线测试与工程检查。依赖官方 gamescaling 包的测试在缺失时明确 skip；Windows 真实输入、截图、服务、模型和训练均需独立现场验收。
