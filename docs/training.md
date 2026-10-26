@@ -26,6 +26,36 @@ python -m scripts.training.data \
 
 加载器再次审计原始 episode，并逐行比较转换结果，防止只修改转换数据及其哈希就绕过实际动作合同。原始文件、划分清单和图像必须保留在原位置。输出目录必须不存在，避免静默覆盖冻结的数据版本。
 
+### 搬迁已有 RGB 数据
+
+清单的 `source_path`、`splits_path`、`data_root` 是本机绝对路径，清单字节哈希也绑定这些位置。复制语料到另一位置或执行环境后，使用 CPU 搬迁入口显式指定新位置：
+
+```bash
+python -m scripts.training.relocate \
+  --dataset output/copied-corpus/converted \
+  --episodes output/copied-corpus/episodes.jsonl \
+  --splits output/copied-corpus/splits.json \
+  --data-root output/copied-corpus
+# 核对上一命令的 content_sha256，再生成一个新转换目录。
+python -m scripts.training.relocate \
+  --dataset output/copied-corpus/converted \
+  --episodes output/copied-corpus/episodes.jsonl \
+  --splits output/copied-corpus/splits.json \
+  --data-root output/copied-corpus \
+  --expect-content-sha256 <previous-content-sha256> \
+  --materialize output/relocated-converted
+```
+
+工具重审全部原始 episode、媒体、授权声明、游戏划分、实际动作/时间/历史/终止，并比较每条转换行和清单审计元数据。只从规范化内容身份中去除上述三个位置字段；不忽略未知清单字段、不允许用重算行哈希掩盖标签变化。文件、路径越界或元数据不一致会拒绝。声明授权仍不自动授予许可，数据许可与复制权限由来源负责。
+
+`--materialize` 只写一个此前不存在的目录：三份原转换 JSONL、新位置清单及 `relocation.json`。见证包含旧/新清单 SHA256 和共同内容身份；原文件和旧清单保持不变，媒体和原始 episode 不自动复制。写入故障可能留下不完整新目录，应保留诊断并另选新输出；工具不覆盖或自动续写。
+
+至少一个上述原始位置字段必须改变；三者均未变时只能复核，工具拒绝将其物化为搬迁清单。仅换转换输出目录不会改变原有数据身份。
+
+物化的新目录可交给原训练加载器用于**新运行**。工具确认新清单身份发生变化，旧检查点的严格恢复仍拒绝它；内容指纹不能替代检查点身份，也不证明跨机器训练逐位一致。该工具仅支持当前 RGB episode/converted v1；不迁移音频索引、特征缓存、模型检查点或冻结研究 cohort。重新采集造成时间/来源字节变化时应登记新数据版本，而不是称为搬迁。
+
+2026-10-27 在同一主机的 Windows 与 WSL 实际核验已保存80样本（64/8/8）：复制后经两个不同路径清单，全部加载行一致，原清单未改动，CUDA 未初始化。原清单 `d58ddde6623581a86ef59502f1e7d32253cc4d4f6bc5a40a40b6b975f3b516d2`，共同内容身份 `b180bf91f1d42e14bb723b19b6fcba6cfb85cb2bd4f117ad837b52f6ff6340c4`。这是同机跨执行环境的数据复核，不是两台电脑或新训练实验。
+
 ## 可复现的合成冒烟流程
 
 以下为 Linux/WSL shell。变量由当前机器的实际检查结果填写；不从其他设备复制默认路径。`MODEL` 为已有快照目录，`UPSTREAM` 为经过核实的官方仓库，`GPU_LOCK` 指向共用重任务锁。示例假定 `PY` 已指向项目训练 venv 的 Python。
