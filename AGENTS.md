@@ -16,3 +16,11 @@
 - 改坐标、时间、标定、输入模态或动作协议时，同步 docs/data-contract.md 和相应测试。
 - 完成前运行 README 的测试命令、`python scripts/validate_project.py`、`python scripts/sync_engineering.py`、`python scripts/check_repository.py`、`git diff --check`，报告跳过和平台限制。
 - 共享工程文件按 engineering/manifest.json 管理；修改后按 docs/shared-engineering.md 升版并校验，不能靠兄弟仓库的未提交代码才能运行。
+
+## 初学者教学记录
+
+- 用户要求随项目推进持续编辑面向初学者的教学记录；不能只更新技术报告、命令或私人进度日志。
+- 教学总入口是 `docs/tutorials/00-learning-guide.md`。每个有实质结果的训练、评测、输入模态或时延里程碑，必须同步新增或更新对应教学篇目和入口。
+- 每篇解释“为什么做、实际怎样做、专业词的普通话含义、结果与失败能说明什么、没证明什么、下一步是什么”，并链接可核对的技术证据。默认读者无需先读代码，也不要求他照抄所有命令。
+- 实验日期、教学补写日期和后续修正分别标明；不得把补写冒充同步完成，不得覆盖失败来迎合预期。
+- 独立 Agent Lab 教学只覆盖本项目；旧工程的 UE/SLAM 教程保留原处，不形成运行依赖。新增教学文件也要同步公开双白名单。
