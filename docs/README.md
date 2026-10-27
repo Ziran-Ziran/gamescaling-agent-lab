@@ -2,6 +2,8 @@
 
 GameScaling Agent Lab 只承担GameScaling 模型训练、多模态输入与低延迟决策。
 
+- **初学者先读：[学习入口](tutorials/00-learning-guide.md)**，含实际实验经过、术语解释和成绩解读；后续随里程碑更新。
+
 - [2026-10-27 夜间结果](overnight-results-2026-10-27.md)：A–F实际完成范围、关键结果/失败、版本、复现入口及后续边界。
 
 - [架构](architecture.md)：组件、现状与规划边界。
